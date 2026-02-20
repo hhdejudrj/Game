@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Тест по программированию</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 30px;
+    background: #f3f4f6;
+  }
+  .question-block {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  }
+  p {
+    font-weight: bold;
+  }
+  input[type="radio"] {
+    margin-right: 6px;
+  }
+  label {
+    display: block;
+    margin: 6px 0;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 5px;
+    transition: 0.2s;
+  }
+  label.correct {
+    background-color: #d4edda;
+    border: 1px solid #28a745;
+  }
+  label.wrong {
+    background-color: #f8d7da;
+    border: 1px solid #dc3545;
+  }
+  button {
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+  button:hover {
+    background: #2980b9;
+  }
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+</style>
+</head>
+<body>
+
+<h2>Тест по JavaScript (Code.mu)</h2>
+
+<div id="test"></div>
+<button id="button">Проверить ответы</button>
+<div id="result"></div>
+
+<script>
+// Вопросы по программированию и JS
+let questions = [
+  'Какой метод используется для добавления элемента в конец массива?',
+  'Какое событие срабатывает при нажатии кнопки мыши?',
+  'Как создать переменную в JavaScript?',
+  'Какой тег используется для подключения JS в HTML?',
+  'Какой оператор сравнивает значение и тип переменной?'
+];
+
+// Правильные ответы
+let answers = [
+  'push',
+  'click',
+  'let',
+  '<script>',
+  '==='
+];
+
+// Варианты ответов
+let options = [
+  ['pop', 'push', 'shift'],
+  ['keydown', 'click', 'mouseover'],
+  ['var', 'let', 'set'],
+  ['<javascript>', '<script>', '<js>'],
+  ['==', '=', '===']
+];
+
+const testDiv = document.getElementById('test');
+const button = document.getElementById('button');
+const resultDiv = document.getElementById('result');
+
+// Создаем HTML вопросы с вариантами
+questions.forEach((q, index) => {
+  const div = document.createElement('div');
+  div.classList.add('question-block');
+
+  const p = document.createElement('p');
+  p.textContent = q;
+  div.appendChild(p);
+
+  options[index].forEach(opt => {
+    const label = document.createElement('label');
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'q' + index;
+    radio.value = opt;
+    label.appendChild(radio);
+    label.appendChild(document.createTextNode(opt));
+    div.appendChild(label);
+  });
+
+  testDiv.appendChild(div);
+});
+
+// Проверка ответов
+button.addEventListener('click', () => {
+  let correctCount = 0;
+
+  questions.forEach((q, index) => {
+    const selected = document.querySelector(`input[name="q${index}"]:checked`);
+
+    document.querySelectorAll(`input[name="q${index}"]`).forEach(r => {
+      r.parentElement.classList.remove('correct', 'wrong');
+    });
+
+    if (selected) {
+      if (selected.value === answers[index]) {
+        selected.parentElement.classList.add('correct');
+        correctCount++;
+      } else {
+        selected.parentElement.classList.add('wrong');
+      }
+    }
+  });
+
+  resultDiv.textContent = `Вы ответили правильно на ${correctCount} из ${questions.length} вопросов.`;
+});
+</script>
+
+</body>
+</html>

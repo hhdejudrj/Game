@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Калькулятор продуктов</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f4f7;
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+#parent {
+  width: 550px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+#form {
+  display: flex;
+  margin-bottom: 15px;
+}
+#form input[type="text"], #form input[type="number"] {
+  padding: 10px;
+  margin-right: 5px;
+  width: 23%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+#form input[type="button"] {
+  padding: 10px 15px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+#form input[type="button"]:hover {
+  background: #2ecc71;
+}
+h2 { margin: 0 0 10px 0; }
+#table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+#table th, #table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+#table td.remove {
+  color: #e74c3c;
+  cursor: pointer;
+  text-decoration: underline;
+}
+#table td.remove:hover { text-decoration: none; }
+#result {
+  text-align: right;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+td.price, td.amount, td.cost {
+  min-width: 60px;
+}
+td.price, td.amount {
+  cursor: text;
+  background: #fefefe;
+}
+</style>
+</head>
+<body>
+
+<div id="parent">
+  <div id="form">
+    <input id="name" type="text" placeholder="название">
+    <input id="price" type="number" placeholder="цена">
+    <input id="amount" type="number" placeholder="количество">
+    <input id="add" type="button" value="добавить">
+  </div>
+
+  <h2>Таблица продуктов:</h2>
+  <table id="table">
+    <tr>
+      <th>название</th>
+      <th>цена</th>
+      <th>кол-во</th>
+      <th>сумма</th>
+      <th>удалить</th>
+    </tr>
+  </table>
+  <div id="result">
+    общий итог: <span id="total">0.00</span>
+  </div>
+</div>
+
+<script>
+let nameInput   = document.querySelector('#name');
+let priceInput  = document.querySelector('#price');
+let amountInput = document.querySelector('#amount');
+let addButton   = document.querySelector('#add');
+let table       = document.querySelector('#table');
+let total       = document.querySelector('#total');
+
+// Функция пересчёта общей суммы
+function recountTotal() {
+  let costs = table.querySelectorAll('.cost');
+  let sum = 0;
+  costs.forEach(td => {
+    let val = parseFloat(td.textContent);
+    if (!isNaN(val)) sum += val;
+  });
+  total.textContent = sum.toFixed(2);
+}
+
+// Функция создания ячейки
+function createCell(tr, text, className) {
+  let td = document.createElement('td');
+  td.textContent = text;
+  if (className) td.classList.add(className);
+  tr.appendChild(td);
+
+  // удаление строки
+  if (className === 'remove') {
+    td.addEventListener('click', () => {
+      tr.remove();
+      recountTotal();
+    });
+  }
+
+  // редактирование цены и количества
+  if (className === 'price' || className === 'amount') {
+    td.contentEditable = true;
+    td.addEventListener('input', () => {
+      let priceTd = tr.querySelector('.price');
+      let amountTd = tr.querySelector('.amount');
+      let costTd = tr.querySelector('.cost');
+      let priceVal = parseFloat(priceTd.textContent.replace(',', '.')) || 0;
+      let amountVal = parseInt(amountTd.textContent) || 0;
+      costTd.textContent = (priceVal * amountVal).toFixed(2);
+      recountTotal();
+    });
+  }
+}
+
+// Добавление продукта
+addButton.addEventListener('click', () => {
+  let productName = nameInput.value.trim();
+  let productPrice = parseFloat(priceInput.value.replace(',', '.'));
+  let productAmount = parseInt(amountInput.value);
+
+  if (!productName) { alert('Введите название продукта'); return; }
+  if (isNaN(productPrice) || productPrice <= 0) { alert('Введите корректную цену'); return; }
+  if (isNaN(productAmount) || productAmount <= 0) { alert('Введите корректное количество'); return; }
+
+  let tr = document.createElement('tr');
+  createCell(tr, productName, 'name');
+  createCell(tr, productPrice.toFixed(2), 'price');
+  createCell(tr, productAmount, 'amount');
+  createCell(tr, (productPrice * productAmount).toFixed(2), 'cost');
+  createCell(tr, 'удалить', 'remove');
+
+  table.appendChild(tr);
+  recountTotal();
+
+  nameInput.value = '';
+  priceInput.value = '';
+  amountInput.value = '';
+});
+</script>
+
+</body>
+</html>
